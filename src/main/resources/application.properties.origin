@@ -5,3 +5,5 @@ spring.datasource.driver-class-name=
 
 spring.jpa.properties.hibernate.dialect=
 spring.jpa.show-sql=
+
+secret=
