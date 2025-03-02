@@ -33,7 +33,7 @@ public class AuthController {
         registerValidator.validate(registerRequest, bindingResult);
 
         if(bindingResult.hasErrors()) {
-            AuthExceptionResponse authExceptionResponse = AuthExceptionResponseGenerator.generate(bindingResult);
+            CompositeExceptionResponse authExceptionResponse = CompositeExceptionResponseGenerator.generate(bindingResult);
             return new ResponseEntity(authExceptionResponse, HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok(authService.register(registerRequest));
@@ -47,8 +47,8 @@ public class AuthController {
 
 
     @ExceptionHandler
-    public ResponseEntity<ExceptionResponse> handleAuthenticationException(AuthException e){
-        ExceptionResponse exceptionResponse=new ExceptionResponse(e.getMessage());
+    public ResponseEntity<SimpleExceptionResponse> handleAuthenticationException(AuthException e){
+        SimpleExceptionResponse exceptionResponse=new SimpleExceptionResponse(e.getMessage());
         return new ResponseEntity(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 

@@ -24,6 +24,7 @@ public class Category {
     @NotEmpty(message = "Name should not be empty")
     private String name;
 
+    @Column(name = "type")
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Transaction type should not be empty")
     private TransactionType transactionType;

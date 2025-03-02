@@ -6,12 +6,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthExceptionResponse {
+public class CompositeExceptionResponse {
 
     private List<FieldErrorBody> errors;
 
