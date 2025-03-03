@@ -3,16 +3,14 @@ package ru.fil.moneyFlow.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "transaction")
-@Data
-@NoArgsConstructor
+@Getter @Setter @EqualsAndHashCode @RequiredArgsConstructor
+//@NoArgsConstructor
 @AllArgsConstructor
 public class Transaction {
 
@@ -35,4 +33,14 @@ public class Transaction {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", amount=" + amount +
+                ", date=" + date +
+                ", user=" + user +
+                ", category=" + category +
+                '}';
+    }
 }

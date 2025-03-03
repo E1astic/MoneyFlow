@@ -6,13 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.fil.moneyFlow.dto.TransactionRequest;
+import ru.fil.moneyFlow.dto.TransactionResponse;
 import ru.fil.moneyFlow.models.Category;
 import ru.fil.moneyFlow.models.Transaction;
+import ru.fil.moneyFlow.models.TransactionType;
 import ru.fil.moneyFlow.models.User;
 import ru.fil.moneyFlow.services.CategoryService;
 import ru.fil.moneyFlow.services.TransactionService;
@@ -20,8 +19,12 @@ import ru.fil.moneyFlow.services.UserService;
 import ru.fil.moneyFlow.utils.CompositeExceptionResponse;
 import ru.fil.moneyFlow.utils.CompositeExceptionResponseGenerator;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RestController
-@RequestMapping("/transaction")
+@RequestMapping("/transactions")
 public class TransactionController {
 
     private final ModelMapper modelMapper;
@@ -46,34 +49,62 @@ public class TransactionController {
                     = CompositeExceptionResponseGenerator.generate(bindingResult);
             return new ResponseEntity<>(compositeExceptionResponse, HttpStatus.BAD_REQUEST);
         }
-        Transaction t=convertToTransaction(transactionRequest);
-        transactionService.save(t);
-        return new ResponseEntity<>(HttpStatus.OK);
+        Transaction transaction = convertToTransaction(transactionRequest);
+        transaction=transactionService.save(transaction);
+        return ResponseEntity.ok(Map.of("transactionId", transaction.getId()));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TransactionResponse>> getAllTransactions() {
+        User user=getCurrentUser();
+        List<Transaction> transactions=transactionService.getByUser(user);
+        List<TransactionResponse> transactionResponses=transactions.stream()
+                .map(this::convertToTransactionResponse).collect(Collectors.toList());
+        return ResponseEntity.ok(transactionResponses);
+    }
+
+    @GetMapping("/income")
+    public ResponseEntity<List<TransactionResponse>> getIncomeTransactions() {
+        User user=getCurrentUser();
+        List<Transaction> transactions=transactionService.getByUserAndTransactionType(user, TransactionType.INCOME);
+        List<TransactionResponse> transactionResponses=transactions.stream()
+                .map(this::convertToTransactionResponse).collect(Collectors.toList());
+        return ResponseEntity.ok(transactionResponses);
+    }
+
+    @GetMapping("/expense")
+    public ResponseEntity<List<TransactionResponse>> getExpenseTransactions() {
+        User user=getCurrentUser();
+        List<Transaction> transactions=transactionService.getByUserAndTransactionType(user, TransactionType.EXPENSE);
+        List<TransactionResponse> transactionResponses=transactions.stream()
+                .map(this::convertToTransactionResponse).collect(Collectors.toList());
+        return ResponseEntity.ok(transactionResponses);
     }
 
 
+    private User getCurrentUser(){
+        return (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
     private Transaction convertToTransaction(TransactionRequest transactionRequest) {
-        Category category=categoryService.getCategory(transactionRequest.getCategoryId()).get();
-        //System.out.println(category);
-        User userFromContext =(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Category category=categoryService.getById(transactionRequest.getCategoryId()).get();
+        User userFromContext=(User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user=userService.getById(userFromContext.getId()).get();
-        //System.out.println(user);
 
         Transaction transaction=new Transaction();
         transaction.setAmount(transactionRequest.getAmount());
         transaction.setDate(transactionRequest.getDate());
 
-        //System.out.println(transaction);
         transaction.setCategory(category);
-        //System.out.println(transaction);
         transaction.setUser(user);
-        //System.out.println(transaction);
 
         category.addTransaction(transaction);
-        //System.out.println(category);
         user.addTransaction(transaction);
-        //System.out.println(user);
 
         return transaction;
+    }
+
+    private TransactionResponse convertToTransactionResponse(Transaction transaction) {
+        return modelMapper.map(transaction, TransactionResponse.class);
     }
 }

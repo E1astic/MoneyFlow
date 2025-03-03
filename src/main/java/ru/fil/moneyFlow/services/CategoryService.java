@@ -19,7 +19,7 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public Optional<Category> getCategory(int id) {
+    public Optional<Category> getById(int id) {
         return categoryRepository.findById(id);
     }
 }
