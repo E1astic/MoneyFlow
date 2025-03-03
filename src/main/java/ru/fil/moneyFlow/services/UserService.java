@@ -1,6 +1,7 @@
 package ru.fil.moneyFlow.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.fil.moneyFlow.dto.UserRequest;
@@ -14,10 +15,12 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<User> getById(int id) {
@@ -33,7 +36,7 @@ public class UserService {
         User user=userRepository.findById(id).get();
         user.setFirstname(userRequest.getFirstname());
         user.setLastname(userRequest.getLastname());
-        user.setPassword(userRequest.getPassword());
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         return user;
     }
 

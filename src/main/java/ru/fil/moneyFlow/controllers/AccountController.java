@@ -37,8 +37,9 @@ public class AccountController {
     public ResponseEntity<UserResponse> updateUser(@RequestBody UserRequest userRequest) {
         User userFromContext = getCurrentUser();
         int id=userFromContext.getId();
-        User updatedUser=userService.update(id, userRequest);
-        return ResponseEntity.ok(convertToUserResponse(updatedUser));
+        User updatedUser=userService.update(id, userRequest); id=updatedUser.getId();
+        User user=userService.getById(id).get();
+        return ResponseEntity.ok(convertToUserResponse(user));
     }
 
     @DeleteMapping("/delete")
