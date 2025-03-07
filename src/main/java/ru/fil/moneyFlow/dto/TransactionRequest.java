@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class TransactionRequest {
 
-    @Min(value = 0)
+    @Min(value = 1, message = "Amount should be greater than 0")
     @NotNull(message = "Amount should not be empty")
     private Integer amount;
 
