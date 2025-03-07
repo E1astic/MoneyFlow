@@ -1,9 +1,16 @@
+# PostgreSQL Database Connection
 spring.datasource.url=
 spring.datasource.username=
 spring.datasource.password=
 spring.datasource.driver-class-name=
 
+# Hibernate / JPA Configuration
 spring.jpa.properties.hibernate.dialect=
 spring.jpa.show-sql=
 
-secret=
+# JWT Configuration
+jwt.secret-key=
+
+# Server Configuration
+server.address=
+server.port=
